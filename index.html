@@ -126,14 +126,14 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
 .portrait .classes{order:2}
 .portrait .controls{order:3;margin-top:0}
 .portrait .clock{font-size:64px}
-.portrait .sectitle{font-size:38px}
-.portrait .hbtn{height:76px;font-size:30px;padding:0 26px}
-.portrait .cls .h{width:150px;font-size:40px}
-.portrait .cls .n{font-size:34px}
+.portrait .sectitle{font-size:42px}
+.portrait .hbtn{height:84px;font-size:34px;padding:0 28px}
+.portrait .cls .h{width:160px;font-size:44px}
+.portrait .cls .n{font-size:38px}
 .portrait .cls:nth-child(n+5){display:none}
-.portrait .empty{font-size:34px}
+.portrait .empty{font-size:38px}
 .portrait #mainBtn{height:124px;font-size:48px}
-.portrait .sbtn{height:124px;font-size:30px}
+.portrait .sbtn{height:132px;font-size:34px}
 .portrait #settings{padding:56px 48px;gap:32px}
 .portrait .hint{display:none}
 .portrait .shead h1{font-size:60px}
@@ -141,11 +141,11 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
 .portrait .presets{width:100%}
 .portrait .preset{padding:18px 28px}
 .portrait .preset .pn,.portrait .preset .pd{font-size:40px}
-.portrait .step .sn{font-size:40px}
+.portrait .step .sn{font-size:44px}
 .portrait .step button{width:88px;height:88px;font-size:48px}
 .portrait .step .sv{width:220px;font-size:60px}
-.portrait .tog .tn,.portrait .tog .tv{font-size:32px}
-.portrait .total{font-size:36px;padding-top:24px}
+.portrait .tog .tn,.portrait .tog .tv{font-size:34px}
+.portrait .total{font-size:40px;padding-top:24px}
 .portrait .sfoot button{height:130px}
 .portrait #backBtn{width:400px;font-size:38px}
 .portrait #startBtn{font-size:48px}
@@ -159,9 +159,11 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
 .portrait .scr h2{font-size:56px}
 .portrait .grid{grid-template-columns:118px repeat(6,minmax(0,1fr))}
 .portrait .dayh{font-size:30px}
-.portrait .slot{font-size:32px;height:112px}
-.portrait .cell{font-size:21px;height:112px;padding:0 4px;overflow-wrap:anywhere;hyphens:auto}
-.portrait .notes{flex-direction:column;gap:6px;font-size:26px}
+.portrait .slot{font-size:32px;height:auto;min-height:112px}
+.portrait #schedRows{flex-grow:1}
+.portrait #schedRows .grid{flex:1}
+.portrait .cell{font-size:23px;height:auto;min-height:112px;padding:0 4px;overflow-wrap:break-word;hyphens:auto}
+.portrait .notes{flex-direction:column;gap:6px;font-size:30px}
 .portrait .legend{font-size:28px}
 
 @media (prefers-reduced-motion: reduce){*{transition:none !important}}
@@ -435,7 +437,7 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
       WEEK.forEach(function (col, ci) {
         var name = col[r], cls = !name ? 'none' : /jiujitsu|open mat/i.test(name) ? 'bjj' : name === PE ? 'pe' : 'mma';
         if (name && ci === n.di && r === n.cur) cls += ' live';
-        row += '<div class="cell ' + cls + '">' + esc(name || '') + '</div>';
+        row += '<div class="cell ' + cls + '">' + esc(name || '').replace(/\//g, '/<wbr>') + '</div>';
       });
       return row + '</div>';
     }).join('');
@@ -602,12 +604,13 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
 
   // ---- escalar a cualquier pantalla ----
   function fit() {
-    var portrait = window.innerHeight > window.innerWidth, W = portrait ? 1080 : 1920;
-    var H = portrait ? Math.max(1700, Math.round(1080 * window.innerHeight / window.innerWidth)) : 1080;
-    $('stage').classList.toggle('portrait', portrait);
-    $('stage').style.height = portrait ? H + 'px' : '';
-    var s = Math.min(window.innerWidth / W, window.innerHeight / H);
-    $('stage').style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+    var w = window.innerWidth, h = window.innerHeight, portrait = h > w, W, H;
+    if (portrait) { W = 1080; H = Math.round(1080 * h / w); if (H < 1700) { H = 1700; W = Math.round(1700 * w / h); } }
+    else { H = 1080; W = Math.round(1080 * w / h); if (W < 1920) { W = 1920; H = Math.round(1920 * h / w); } }
+    var st = $('stage');
+    st.classList.toggle('portrait', portrait);
+    st.style.width = W + 'px'; st.style.height = H + 'px';
+    st.style.transform = 'translate(-50%, -50%) scale(' + (w / W) + ')';
   }
   window.addEventListener('resize', fit);
 
