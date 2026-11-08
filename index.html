@@ -7,6 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Timer NE">
 <meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Timer Nueva Era</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -586,7 +589,7 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
     if (best) { best.focus(); markFocus(best); }
   }
   document.addEventListener('keydown', function (ev) {
-    idleMs = 0; audio();
+    idleMs = 0; audio(); goFull(); keepAwake();
     var k = ev.key;
     if (st.screen === 'schedule') { ev.preventDefault(); st.screen = 'timer'; render(); focusDefault(); return; }
     var dirs = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
@@ -594,7 +597,7 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
     if (k === 'MediaPlayPause' || k === ' ' && st.screen === 'timer') { ev.preventDefault(); $('mainBtn').click(); return; }
     if ((k === 'Escape' || k === 'GoBack' || k === 'BrowserBack' || k === 'Backspace') && st.screen === 'settings') { ev.preventDefault(); $('backBtn').click(); return; }
   });
-  document.addEventListener('pointerdown', function () { idleMs = 0; markFocus(null); });
+  document.addEventListener('pointerdown', function () { idleMs = 0; markFocus(null); audio(); goFull(); keepAwake(); });
   document.addEventListener('focusin', function (ev) { if (ev.target.tagName === 'BUTTON') markFocus(ev.target); });
 
   // ---- escalar a cualquier pantalla ----
