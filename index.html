@@ -23,7 +23,8 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#000;overflow:hidden;cursor:default}
-#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center;
+#wrap{position:fixed;left:0;top:0;width:100%;height:100%;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;
   background:#0E1A13;color:var(--ink);font-family:var(--ui);overflow:hidden;transition:background-color 700ms var(--ease)}
 .screen{position:absolute;inset:0;display:none}
 .screen.on{display:flex}
@@ -107,13 +108,13 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
 .dayh{text-align:center;font-size:25px;font-weight:700;padding:12px 0;border-radius:10px;background:#262626;color:#E0E0E0}
 .dayh.today{background:var(--ink);color:#111}
 .slot{display:flex;align-items:center;font-family:var(--num);font-size:30px;font-weight:600;color:#D8D8D8;height:84px}
-.slot.now{color:var(--go)}
+.slot.now{color:#F87171}
 .cell{display:flex;align-items:center;justify-content:center;text-align:center;padding:0 10px;border-radius:10px;font-size:21px;line-height:1.15;height:84px;border:3px solid transparent}
 .cell.bjj{background:#F1F1F1;color:#111;font-weight:600;border-color:#F1F1F1}
 .cell.mma{background:#333;color:var(--ink);border-color:#666}
 .cell.pe{background:#1D1D1D;color:#BDBDBD;border-color:#333}
 .cell.none{border-color:#262626}
-.cell.live{border-color:var(--go)}
+.cell.live{background:#DC2626;border-color:#FCA5A5;color:#FFFFFF;font-weight:700}
 .notes{font-size:21px;color:#CFCFCF;display:flex;gap:40px;padding-top:4px}
 
 
@@ -128,7 +129,7 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
 .portrait .clock{font-size:64px}
 .portrait .sectitle{font-size:42px}
 .portrait .hbtn{height:84px;font-size:34px;padding:0 28px}
-.portrait .cls .h{width:160px;font-size:44px}
+.portrait .cls .h{width:210px;font-size:44px;white-space:nowrap}
 .portrait .cls .n{font-size:38px}
 .portrait .cls:nth-child(n+5){display:none}
 .portrait .empty{font-size:38px}
@@ -170,6 +171,7 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
 </style>
 </head>
 <body>
+<div id="wrap">
 <div id="stage">
 
   <!-- TIMER -->
@@ -261,6 +263,7 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
       <div class="notes"><div>* Sábado jiujitsu principiantes y avanzados: inicio 11:30 AM</div><div>** Viernes open mat: inicio 6:30 PM</div></div>
     </div>
   </section>
+</div>
 </div>
 
 <script>
@@ -604,15 +607,19 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
 
   // ---- escalar a cualquier pantalla ----
   function fit() {
-    var w = window.innerWidth, h = window.innerHeight, portrait = h > w, W, H;
+    var wr = $('wrap'), w = wr.clientWidth || document.documentElement.clientWidth, h = wr.clientHeight || document.documentElement.clientHeight, portrait = h > w, W, H;
     if (portrait) { W = 1080; H = Math.round(1080 * h / w); if (H < 1700) { H = 1700; W = Math.round(1700 * w / h); } }
     else { H = 1080; W = Math.round(1080 * w / h); if (W < 1920) { W = 1920; H = Math.round(1920 * h / w); } }
     var st = $('stage');
     st.classList.toggle('portrait', portrait);
     st.style.width = W + 'px'; st.style.height = H + 'px';
-    st.style.transform = 'translate(-50%, -50%) scale(' + (w / W) + ')';
+    st.style.transform = 'scale(' + (w / W) + ')';
+    var rz = portrait ? Math.max(0.5, Math.min(1, (H - 1010) / 940)) : 1;
+    document.querySelector('.ringwrap').style.zoom = rz;
   }
   window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', function () { setTimeout(fit, 200); });
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
 
   // ---- inicio ----
   st.left = cfg.fight;
