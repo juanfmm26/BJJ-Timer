@@ -501,7 +501,7 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
       var b = document.createElement('button'); b.type = 'button'; b.className = 'preset';
       var d = /×/.test(pr.n) ? (pr.rest ? 'descanso ' + fmt(pr.rest) : 'sin descanso') : pr.rounds + ' × ' + fmt(pr.fight) + (pr.rest ? ' · ' + fmt(pr.rest) : '');
       b.innerHTML = '<span class="pn">' + esc(pr.n) + '</span><span class="pd">' + esc(d) + '</span>';
-      b.addEventListener('click', function () { cfg.fight = pr.fight; cfg.rest = pr.rest; cfg.rounds = pr.rounds; preset = i; changed(); });
+      b.addEventListener('click', function () { audio(); cfg.fight = pr.fight; cfg.rest = pr.rest; cfg.rounds = pr.rounds; preset = i; save(); renderSettings(); begin(); });
       $('presetList').appendChild(b); presetBtns.push(b);
     });
     [['Duración del round', 'fight', 30, 30, 900], ['Descanso', 'rest', 10, 0, 300], ['Rounds', 'rounds', 1, 1, 20], ['Preparación', 'prep', 5, 0, 30]].forEach(function (s) {
@@ -595,7 +595,12 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
   }
   document.addEventListener('keydown', function (ev) {
     idleMs = 0; audio(); goFull(); keepAwake();
-    var k = ev.key;
+    var k = ev.key, kc = ev.keyCode || ev.which;
+    var byCode = { 37: 'ArrowLeft', 38: 'ArrowUp', 39: 'ArrowRight', 40: 'ArrowDown', 19: 'ArrowUp', 20: 'ArrowDown', 21: 'ArrowLeft', 22: 'ArrowRight', 23: 'Enter', 13: 'Enter', 4: 'GoBack', 179: 'MediaPlayPause', 85: 'MediaPlayPause' };
+    var alias = { Left: 'ArrowLeft', Right: 'ArrowRight', Up: 'ArrowUp', Down: 'ArrowDown', Esc: 'Escape' };
+    if (alias[k]) k = alias[k];
+    if (!k || k === 'Unidentified') k = byCode[kc] || k;
+    if (k === 'Enter' && document.activeElement && document.activeElement.tagName === 'BUTTON' && (ev.key !== 'Enter')) { ev.preventDefault(); document.activeElement.click(); return; }
     if (st.screen === 'schedule') { ev.preventDefault(); st.screen = 'timer'; render(); focusDefault(); return; }
     var dirs = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
     if (dirs[k]) { ev.preventDefault(); moveFocus(dirs[k]); return; }
