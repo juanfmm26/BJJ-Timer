@@ -593,6 +593,11 @@ button:focus-visible,button.kfocus{outline:6px solid var(--ink);outline-offset:5
     });
     if (best) { best.focus(); markFocus(best); }
   }
+  // botón Atrás de la app de Android TV: vuelve al timer desde Ajustes u Horario
+  window.__neBack = function () {
+    if (st.screen !== 'timer') { st.screen = 'timer'; render(); focusDefault(); return true; }
+    return false;
+  };
   document.addEventListener('keydown', function (ev) {
     idleMs = 0; audio(); goFull(); keepAwake();
     var k = ev.key, kc = ev.keyCode || ev.which;

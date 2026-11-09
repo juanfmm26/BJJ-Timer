@@ -1,0 +1,47 @@
+name: App Android TV (APK)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - '.github/workflows/android-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Copiar el timer dentro de la app (versión sin internet)
+        run: |
+          mkdir -p android/app/src/main/assets
+          cp index.html android/app/src/main/assets/index.html
+
+      - name: Compilar APK
+        working-directory: android
+        run: gradle assembleRelease -Pvc=${{ github.run_number }} --no-daemon
+
+      - name: Publicar APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk timer-nueva-era.apk
+          gh release delete app --yes --cleanup-tag || true
+          gh release create app timer-nueva-era.apk \
+            --title "App Timer Nueva Era (Android TV) – build ${{ github.run_number }}" \
+            --notes "Descarga directa: https://github.com/${{ github.repository }}/releases/download/app/timer-nueva-era.apk" \
+            --latest
